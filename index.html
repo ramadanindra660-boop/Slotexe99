@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Game Roll Interaktif</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0d0e15;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #161824;
+            border: 2px solid #2a2e45;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #00ffcc;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .score-board {
+            background: #0d0e15;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: #ffcc00;
+            border: 1px solid #333;
+        }
+
+        .machine {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            background: #0d0e15;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #00ffcc;
+            margin-bottom: 25px;
+        }
+
+        .reel {
+            flex: 1;
+            height: 90px;
+            background: #1a1c2e;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            border: 1px solid #2a2e45;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+
+        .status {
+            height: 24px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .status.win { color: #00ff66; }
+        .status.lose { color: #ff4757; }
+
+        button {
+            width: 100%;
+            background: linear-gradient(45deg, #00ffcc, #0099ff);
+            border: none;
+            color: #000;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Mini Game Roll</h1>
+        
+        <div class="score-board">
+            Koin: <span id="coins">100</span>
+        </div>
+
+        <div class="machine">
+            <div class="reel" id="reel1">❓</div>
+            <div class="reel" id="reel2">❓</div>
+            <div class="reel" id="reel3">❓</div>
+        </div>
+
+        <div class="status" id="statusMsg">Tekan tombol untuk mulai!</div>
+
+        <button id="spinBtn" onclick="spin()">PUTAR (10 KOIN)</button>
+    </div>
+
+    <script>
+        const items = ['🍎', '🍋', '🔔', '💎', '7️⃣'];
+        let coins = 100;
+
+        function spin() {
+            if (coins < 10) {
+                document.getElementById('statusMsg').innerText = "Koin habis! Refresh halaman.";
+                document.getElementById('statusMsg').className = "status lose";
+                return;
+            }
+
+            // Potong koin
+            coins -= 10;
+            document.getElementById('coins').innerText = coins;
+
+            const btn = document.getElementById('spinBtn');
+            const status = document.getElementById('statusMsg');
+            btn.disabled = true;
+            status.innerText = "Mengacak...";
+            status.className = "status";
+
+            let counter = 0;
+            const interval = setInterval(() => {
+                const res1 = items[Math.floor(Math.random() * items.length)];
+                const res2 = items[Math.floor(Math.random() * items.length)];
+                const res3 = items[Math.floor(Math.random() * items.length)];
+
+                document.getElementById('reel1').innerText = res1;
+                document.getElementById('reel2').innerText = res2;
+                document.getElementById('reel3').innerText = res3;
+
+                counter++;
+                if (counter >= 15) {
+                    clearInterval(interval);
+                    btn.disabled = false;
+                    checkResult(res1, res2, res3);
+                }
+            }, 100);
+        }
+
+        function checkResult(r1, r2, r3) {
+            const status = document.getElementById('statusMsg');
+            
+            // Logika Kemenangan
+            if (r1 === r2 && r2 === r3) {
+                coins += 50;
+                status.innerText = "JACKPOT! +50 Koin";
+                status.className = "status win";
+            } else if (r1 === r2 || r2 === r3 || r1 === r3) {
+                coins += 15;
+                status.innerText = "Dapat Pasangan! +15 Koin";
+                status.className = "status win";
+            } else {
+                status.innerText = "Coba lagi!";
+                status.className = "status lose";
+            }
+            
+            document.getElementById('coins').innerText = coins;
+        }
+    </script>
+
+</body>
+</html>
